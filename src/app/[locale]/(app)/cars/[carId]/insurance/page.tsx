@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
@@ -62,12 +63,12 @@ export default function InsurancePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("common.startDate")}</Label>
-                  <Input name="start_date" type="date" defaultValue={m.editing?.start_date ?? ""} />
+                  <DatePicker name="start_date" defaultValue={m.editing?.start_date ?? ""} />
                   <FieldError error={m.errors.start_date} />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("common.endDate")}</Label>
-                  <Input name="end_date" type="date" defaultValue={m.editing?.end_date ?? ""} />
+                  <DatePicker name="end_date" defaultValue={m.editing?.end_date ?? ""} />
                   <FieldError error={m.errors.end_date} />
                 </div>
               </div>

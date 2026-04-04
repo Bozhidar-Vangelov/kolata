@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
@@ -70,17 +71,16 @@ export default function OilChangePage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("oilChange.changeDate")}</Label>
-                  <Input
+                  <DatePicker
                     name="change_date"
-                    type="date"
                     value={changeDate}
-                    onChange={(e) => setChangeDate(e.target.value)}
+                    onValueChange={setChangeDate}
                   />
                   <FieldError error={m.errors.change_date} />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("oilChange.nextChangeDate")}</Label>
-                  <Input type="date" value={nextChangeDate} readOnly disabled className="bg-muted" />
+                  <DatePicker value={nextChangeDate} disabled className="bg-muted" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
