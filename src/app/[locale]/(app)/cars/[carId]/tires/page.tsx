@@ -63,7 +63,7 @@ export default function TiresPage() {
       {m.showForm && (
         <Card>
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
               <div className="space-y-2">
                 <Label>{t("tires.title")}</Label>
                 <Select value={season} onValueChange={(v) => { if (v) setSeason(v as "winter" | "summer" | "all_season"); }}>

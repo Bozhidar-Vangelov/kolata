@@ -52,7 +52,7 @@ export default function LoginPage() {
         <CardTitle className="text-2xl">{t("auth.login")}</CardTitle>
         <CardDescription>{t("common.appName")}</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <CardContent className="space-y-4">
           {error && (
             <p className="text-sm text-destructive">{error}</p>

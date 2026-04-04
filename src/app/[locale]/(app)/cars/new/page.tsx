@@ -76,7 +76,7 @@ export default function NewCarPage() {
         <CardHeader>
           <CardTitle>{t("cars.addCar")}</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit} noValidate>
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">{t("cars.name")} *</Label>

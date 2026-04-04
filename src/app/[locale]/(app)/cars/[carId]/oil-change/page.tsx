@@ -66,7 +66,7 @@ export default function OilChangePage() {
       {m.showForm && (
         <Card>
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("oilChange.changeDate")}</Label>
