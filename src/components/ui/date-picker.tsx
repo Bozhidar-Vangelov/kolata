@@ -48,6 +48,11 @@ function DatePicker({
   }, [defaultValue, isControlled])
 
   const selectedDate = parseDate(currentValue)
+  const [month, setMonth] = React.useState<Date>(selectedDate ?? new Date())
+
+  React.useEffect(() => {
+    if (selectedDate) setMonth(selectedDate)
+  }, [currentValue])
 
   function handleSelect(nextDate: Date | undefined) {
     const nextValue = nextDate ? format(nextDate, "yyyy-MM-dd") : ""
@@ -87,7 +92,7 @@ function DatePicker({
           <span className="truncate">{selectedDate ? format(selectedDate, "PPP") : ""}</span>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar mode="single" selected={selectedDate} month={selectedDate} onSelect={handleSelect} />
+          <Calendar mode="single" selected={selectedDate} month={month} onMonthChange={setMonth} onSelect={handleSelect} />
         </PopoverContent>
       </Popover>
     </>
