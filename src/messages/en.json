@@ -13,7 +13,14 @@
     "startDate": "Start date",
     "endDate": "End date",
     "company": "Company",
-    "currency": "BGN"
+    "currency": "BGN",
+    "priceTooLarge": "Price cannot exceed 99,999,999.99",
+    "priceNegative": "Price cannot be negative",
+    "required": "This field is required",
+    "invalidDate": "Invalid date",
+    "endBeforeStart": "End date must be after start date",
+    "kmNegative": "Kilometers cannot be negative",
+    "nextKmBeforeCurrent": "Next change km must be greater than current km"
   },
   "auth": {
     "login": "Sign in",

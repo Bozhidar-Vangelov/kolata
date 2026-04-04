@@ -1,11 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,81 +12,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Plus } from "lucide-react";
+import { FieldError } from "@/components/ui/field-error";
+import { useMaintenance } from "@/hooks/use-maintenance";
+import { MaintenancePageHeader } from "@/components/maintenance/page-header";
+import { FormActions } from "@/components/maintenance/form-actions";
 import { RecordList } from "@/components/maintenance/record-list";
+import { validateYear, hasErrors } from "@/lib/validation";
 import type { Database } from "@/types/database";
 
 type Tires = Database["public"]["Tables"]["tires"]["Row"];
 
 export default function TiresPage() {
   const t = useTranslations();
-  const params = useParams();
-  const carId = params.carId as string;
-  const [records, setRecords] = useState<Tires[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<Tires | null>(null);
-  const [loading, setLoading] = useState(false);
   const [season, setSeason] = useState<"winter" | "summer" | "all_season">("summer");
 
-  const load = useCallback(async () => {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("tires")
-      .select("*")
-      .eq("car_id", carId)
-      .order("created_at", { ascending: false });
-    setRecords(data ?? []);
-  }, [carId]);
-
-  useEffect(() => { load(); }, [load]);
-
-  function openAdd() {
-    setEditing(null);
-    setSeason("summer");
-    setShowForm(true);
-  }
-
-  function openEdit(record: Tires) {
-    setEditing(record);
-    setSeason(record.season);
-    setShowForm(true);
-  }
-
-  function closeForm() {
-    setShowForm(false);
-    setEditing(null);
-  }
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    const fd = new FormData(e.currentTarget);
-    const supabase = createClient();
-
-    const payload = {
-      car_id: carId,
-      season,
-      year: fd.get("year") ? Number(fd.get("year")) : null,
-      brand: (fd.get("brand") as string) || null,
-    };
-
-    if (editing) {
-      await supabase.from("tires").update(payload).eq("id", editing.id);
-    } else {
-      await supabase.from("tires").insert(payload);
-    }
-
-    setLoading(false);
-    closeForm();
-    load();
-  }
-
-  async function handleDelete(id: string) {
-    if (!confirm("Are you sure?")) return;
-    const supabase = createClient();
-    await supabase.from("tires").delete().eq("id", id);
-    load();
-  }
+  const m = useMaintenance<Tires>({
+    table: "tires",
+    orderBy: "created_at",
+    onOpenAdd: () => setSeason("summer"),
+    onOpenEdit: (r) => setSeason(r.season),
+  });
 
   const seasonLabels: Record<string, string> = {
     winter: t("tires.winter"),
@@ -98,35 +39,36 @@ export default function TiresPage() {
     all_season: t("tires.allSeason"),
   };
 
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const errs: Record<string, string> = {};
+
+    const year = validateYear(fd.get("year") as string, errs, t, { min: 2000 });
+
+    if (hasErrors(errs)) { m.setErrors(errs); return; }
+
+    await m.submitRecord({
+      car_id: m.carId,
+      season,
+      year,
+      brand: (fd.get("brand") as string) || null,
+    });
+  }
+
   return (
     <div className="p-4 space-y-4">
-      <Link
-        href={`/cars/${carId}`}
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {t("common.back")}
-      </Link>
+      <MaintenancePageHeader carId={m.carId} title={t("tires.title")} onAdd={m.openAdd} />
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("tires.title")}</h1>
-        <Button size="sm" onClick={openAdd}>
-          <Plus className="h-4 w-4 mr-1" />
-          {t("common.add")}
-        </Button>
-      </div>
-
-      {showForm && (
+      {m.showForm && (
         <Card>
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               <div className="space-y-2">
                 <Label>{t("tires.title")}</Label>
                 <Select value={season} onValueChange={(v) => { if (v) setSeason(v as "winter" | "summer" | "all_season"); }}>
                   <SelectTrigger>
-                    <SelectValue>
-                      {seasonLabels[season]}
-                    </SelectValue>
+                    <SelectValue>{seasonLabels[season]}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="winter">{t("tires.winter")}</SelectItem>
@@ -138,30 +80,24 @@ export default function TiresPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("tires.year")}</Label>
-                  <Input name="year" type="number" min="2000" max="2099" defaultValue={editing?.year ?? ""} />
+                  <Input name="year" type="number" defaultValue={m.editing?.year ?? ""} />
+                  <FieldError error={m.errors.year} />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("tires.brand")}</Label>
-                  <Input name="brand" defaultValue={editing?.brand ?? ""} />
+                  <Input name="brand" defaultValue={m.editing?.brand ?? ""} />
                 </div>
               </div>
-              <div className="flex gap-3">
-                <Button type="submit" disabled={loading}>
-                  {loading ? t("common.loading") : t("common.save")}
-                </Button>
-                <Button type="button" variant="outline" onClick={closeForm}>
-                  {t("common.cancel")}
-                </Button>
-              </div>
+              <FormActions loading={m.loading} onCancel={m.closeForm} />
             </form>
           </CardContent>
         </Card>
       )}
 
       <RecordList
-        records={records}
-        onDelete={handleDelete}
-        onEdit={openEdit}
+        records={m.records}
+        onDelete={m.handleDelete}
+        onEdit={m.openEdit}
         renderDetails={(r) => (
           <div className="text-sm space-y-1">
             <p className="font-semibold">{seasonLabels[r.season]}</p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -8,44 +9,51 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { FieldError } from "@/components/ui/field-error";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { validateRequired, validateYear, hasErrors } from "@/lib/validation";
 
 export default function NewCarPage() {
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
+    const fd = new FormData(e.currentTarget);
+    const errs: Record<string, string> = {};
+
+    const name = (fd.get("name") as string).trim();
+    validateRequired(name, "name", errs, t);
+    const year = validateYear(fd.get("year") as string, errs, t);
+
+    if (hasErrors(errs)) { setErrors(errs); return; }
+
+    setErrors({});
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
     const supabase = createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-      setError("Not authenticated");
+      toast.error("Not authenticated");
       setLoading(false);
       return;
     }
 
     const { error } = await supabase.from("cars").insert({
       user_id: user.id,
-      name: formData.get("name") as string,
-      make: (formData.get("make") as string) || null,
-      model: (formData.get("model") as string) || null,
-      year: formData.get("year") ? Number(formData.get("year")) : null,
-      license_plate: (formData.get("license_plate") as string) || null,
+      name,
+      make: (fd.get("make") as string) || null,
+      model: (fd.get("model") as string) || null,
+      year,
+      license_plate: (fd.get("license_plate") as string) || null,
     });
 
     if (error) {
-      setError(error.message);
+      toast.error(error.message);
       setLoading(false);
       return;
     }
@@ -68,12 +76,12 @@ export default function NewCarPage() {
         <CardHeader>
           <CardTitle>{t("cars.addCar")}</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <CardContent className="space-y-4">
-            {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="space-y-2">
               <Label htmlFor="name">{t("cars.name")} *</Label>
-              <Input id="name" name="name" required />
+              <Input id="name" name="name" />
+              <FieldError error={errors.name} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -88,7 +96,8 @@ export default function NewCarPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="year">{t("cars.year")}</Label>
-                <Input id="year" name="year" type="number" min="1900" max="2099" />
+                <Input id="year" name="year" type="number" />
+                <FieldError error={errors.year} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="license_plate">{t("cars.licensePlate")}</Label>
