@@ -1,0 +1,109 @@
+{
+  "common": {
+    "appName": "Kolata",
+    "save": "Запази",
+    "cancel": "Отказ",
+    "edit": "Редактирай",
+    "delete": "Изтрий",
+    "add": "Добави",
+    "back": "Назад",
+    "loading": "Зареждане...",
+    "noData": "Няма данни",
+    "price": "Цена",
+    "startDate": "Начална дата",
+    "endDate": "Крайна дата",
+    "company": "Компания",
+    "currency": "лв."
+  },
+  "auth": {
+    "login": "Вход",
+    "register": "Регистрация",
+    "email": "Имейл",
+    "password": "Парола",
+    "confirmPassword": "Потвърди парола",
+    "forgotPassword": "Забравена парола?",
+    "noAccount": "Нямате акаунт?",
+    "hasAccount": "Имате акаунт?",
+    "loginSuccess": "Успешен вход",
+    "registerSuccess": "Проверете имейла си за потвърждение"
+  },
+  "nav": {
+    "dashboard": "Табло",
+    "cars": "Коли",
+    "settings": "Настройки",
+    "language": "Език",
+    "signOut": "Изход"
+  },
+  "cars": {
+    "myCars": "Моите коли",
+    "addCar": "Добави кола",
+    "name": "Име",
+    "make": "Марка",
+    "model": "Модел",
+    "year": "Година",
+    "licensePlate": "Регистрационен номер"
+  },
+  "maintenance": {
+    "insurance": "Застраховка",
+    "kasko": "Каско",
+    "inspection": "Технически преглед",
+    "oilChange": "Смяна на масло",
+    "vignette": "Винетка",
+    "tires": "Гуми"
+  },
+  "insurance": {
+    "title": "Застраховка",
+    "company": "Застрахователна компания"
+  },
+  "kasko": {
+    "title": "Каско",
+    "company": "Компания",
+    "type": "Тип",
+    "cashPayout": "Парично обезщетение",
+    "partnerService": "Партньорски сервиз",
+    "freeRoadside": "Безплатна пътна помощ"
+  },
+  "inspection": {
+    "title": "Технически преглед"
+  },
+  "oilChange": {
+    "title": "Смяна на масло",
+    "changeDate": "Дата на смяна",
+    "currentKm": "Километри при смяна",
+    "nextChangeKm": "Следваща смяна на км",
+    "oilType": "Тип масло",
+    "nextChangeDate": "Следваща смяна на"
+  },
+  "vignette": {
+    "title": "Винетка"
+  },
+  "tires": {
+    "title": "Гуми",
+    "winter": "Зимни",
+    "summer": "Летни",
+    "allSeason": "Всесезонни",
+    "brand": "Марка",
+    "year": "Година"
+  },
+  "notifications": {
+    "title": "Известия",
+    "push": "Push известия",
+    "email": "Имейл известия",
+    "daysBefore": "{days} дни преди",
+    "enablePush": "Включи push известия",
+    "notify10Days": "10 дни преди",
+    "notify5Days": "5 дни преди",
+    "notify1Day": "1 ден преди"
+  },
+  "status": {
+    "valid": "Валиден",
+    "expiringSoon": "Изтича скоро",
+    "expired": "Изтекъл",
+    "notSet": "Не е зададен"
+  },
+  "landing": {
+    "hero": "Следи поддръжката на колата си",
+    "subtitle": "Застраховки, каско, технически преглед, масло, винетка и гуми — всичко на едно място.",
+    "cta": "Започни безплатно"
+  }
+}

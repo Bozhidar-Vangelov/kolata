@@ -1,0 +1,109 @@
+{
+  "common": {
+    "appName": "Kolata",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "back": "Back",
+    "loading": "Loading...",
+    "noData": "No data",
+    "price": "Price",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "company": "Company",
+    "currency": "BGN"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginSuccess": "Signed in successfully",
+    "registerSuccess": "Check your email for confirmation"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "cars": "Cars",
+    "settings": "Settings",
+    "language": "Language",
+    "signOut": "Sign out"
+  },
+  "cars": {
+    "myCars": "My Cars",
+    "addCar": "Add Car",
+    "name": "Name",
+    "make": "Make",
+    "model": "Model",
+    "year": "Year",
+    "licensePlate": "License plate"
+  },
+  "maintenance": {
+    "insurance": "Insurance",
+    "kasko": "Kasko",
+    "inspection": "Technical Inspection",
+    "oilChange": "Oil Change",
+    "vignette": "Vignette",
+    "tires": "Tires"
+  },
+  "insurance": {
+    "title": "Insurance",
+    "company": "Insurance company"
+  },
+  "kasko": {
+    "title": "Kasko",
+    "company": "Company",
+    "type": "Type",
+    "cashPayout": "Cash payout",
+    "partnerService": "Partner service repair",
+    "freeRoadside": "Free roadside assistance"
+  },
+  "inspection": {
+    "title": "Technical Inspection"
+  },
+  "oilChange": {
+    "title": "Oil Change",
+    "changeDate": "Change date",
+    "currentKm": "Kilometers at change",
+    "nextChangeKm": "Next change at km",
+    "oilType": "Oil type",
+    "nextChangeDate": "Next change by"
+  },
+  "vignette": {
+    "title": "Vignette"
+  },
+  "tires": {
+    "title": "Tires",
+    "winter": "Winter",
+    "summer": "Summer",
+    "allSeason": "All season",
+    "brand": "Brand",
+    "year": "Year"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "push": "Push notifications",
+    "email": "Email notifications",
+    "daysBefore": "{days} days before",
+    "enablePush": "Enable push notifications",
+    "notify10Days": "10 days before",
+    "notify5Days": "5 days before",
+    "notify1Day": "1 day before"
+  },
+  "status": {
+    "valid": "Valid",
+    "expiringSoon": "Expiring soon",
+    "expired": "Expired",
+    "notSet": "Not set"
+  },
+  "landing": {
+    "hero": "Track your car maintenance",
+    "subtitle": "Insurance, kasko, technical inspection, oil, vignette and tires — all in one place.",
+    "cta": "Get started for free"
+  }
+}
