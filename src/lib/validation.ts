@@ -69,9 +69,12 @@ export function validateYear(
   raw: string,
   errs: Errors,
   t: T,
-  { field = "year", min = 1900, max = 2099 } = {}
+  { field = "year", min = 1900, max = 2099, required = false } = {}
 ): number | null {
-  if (!raw) return null;
+  if (!raw) {
+    if (required) errs[field] = t("common.required");
+    return null;
+  }
   const year = Number(raw);
   if (isNaN(year) || year < min || year > max) {
     errs[field] = t("common.invalidDate");

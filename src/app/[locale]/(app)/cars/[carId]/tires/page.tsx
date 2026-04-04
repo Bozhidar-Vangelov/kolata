@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { YearPicker } from "@/components/ui/date-picker";
 import { Card, CardContent } from "@/components/ui/card";
 import { FieldError } from "@/components/ui/field-error";
 import { useMaintenance } from "@/hooks/use-maintenance";
@@ -24,13 +25,16 @@ type Tires = Database["public"]["Tables"]["tires"]["Row"];
 
 export default function TiresPage() {
   const t = useTranslations();
+  const currentYear = new Date().getFullYear();
+
   const [season, setSeason] = useState<"winter" | "summer" | "all_season">("summer");
+  const [year, setYear] = useState<string>(String(currentYear));
 
   const m = useMaintenance<Tires>({
     table: "tires",
     orderBy: "created_at",
-    onOpenAdd: () => setSeason("summer"),
-    onOpenEdit: (r) => setSeason(r.season),
+    onOpenAdd: () => { setSeason("summer"); setYear(String(currentYear)); },
+    onOpenEdit: (r) => { setSeason(r.season); setYear(r.year ? String(r.year) : String(currentYear)); },
   });
 
   const seasonLabels: Record<string, string> = {
@@ -44,7 +48,7 @@ export default function TiresPage() {
     const fd = new FormData(e.currentTarget);
     const errs: Record<string, string> = {};
 
-    const year = validateYear(fd.get("year") as string, errs, t, { min: 2000 });
+    const year = validateYear(fd.get("year") as string, errs, t, { min: 2000, required: true });
 
     if (hasErrors(errs)) { m.setErrors(errs); return; }
 
@@ -79,8 +83,8 @@ export default function TiresPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>{t("tires.year")}</Label>
-                  <Input name="year" type="number" defaultValue={m.editing?.year ?? ""} />
+                  <Label>{t("tires.year")} *</Label>
+                  <YearPicker name="year" defaultValue={year} onValueChange={setYear} />
                   <FieldError error={m.errors.year} />
                 </div>
                 <div className="space-y-2">
