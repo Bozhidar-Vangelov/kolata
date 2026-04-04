@@ -13,7 +13,7 @@
     "startDate": "Start date",
     "endDate": "End date",
     "company": "Company",
-    "currency": "BGN",
+    "currency": "€",
     "priceTooLarge": "Price cannot exceed 99,999,999.99",
     "priceNegative": "Price cannot be negative",
     "required": "This field is required",
