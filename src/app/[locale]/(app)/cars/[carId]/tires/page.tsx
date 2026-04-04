@@ -89,7 +89,7 @@ export default function TiresPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>{t("tires.brand")}</Label>
-                  <Input name="brand" defaultValue={m.editing?.brand ?? ""} />
+                  <Input name="brand" maxLength={30} defaultValue={m.editing?.brand ?? ""} />
                 </div>
               </div>
               <FormActions loading={m.loading} onCancel={m.closeForm} />

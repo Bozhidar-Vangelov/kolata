@@ -11,7 +11,7 @@ import { useMaintenance } from "@/hooks/use-maintenance";
 import { MaintenancePageHeader } from "@/components/maintenance/page-header";
 import { FormActions } from "@/components/maintenance/form-actions";
 import { RecordList, formatDate, formatPrice } from "@/components/maintenance/record-list";
-import { validateDate, validateRequired, validatePrice, validateKm, hasErrors } from "@/lib/validation";
+import { validateDate, validateRequired, validatePrice, validateKm, validateMaxLength, hasErrors } from "@/lib/validation";
 import { addYears, format, parseISO } from "date-fns";
 import type { Database } from "@/types/database";
 
@@ -46,6 +46,7 @@ export default function OilChangePage() {
     validateDate(changeDateVal, "change_date", errs, t);
     const { currentKm, nextChangeKm } = validateKm(fd.get("current_km"), fd.get("next_change_km"), errs, t);
     validateRequired(oilType, "oil_type", errs, t);
+    validateMaxLength(oilType, "oil_type", 50, errs, t);
     const price = validatePrice(fd.get("price"), errs, t);
 
     if (hasErrors(errs)) { m.setErrors(errs); return; }
@@ -97,7 +98,7 @@ export default function OilChangePage() {
               </div>
               <div className="space-y-2">
                 <Label>{t("oilChange.oilType")}</Label>
-                <Input name="oil_type" defaultValue={m.editing?.oil_type ?? ""} />
+                <Input name="oil_type" maxLength={50} defaultValue={m.editing?.oil_type ?? ""} />
                 <FieldError error={m.errors.oil_type} />
               </div>
               <div className="space-y-2">

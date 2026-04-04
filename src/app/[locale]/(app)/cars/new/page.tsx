@@ -12,7 +12,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { FieldError } from "@/components/ui/field-error";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { validateRequired, validateYear, hasErrors } from "@/lib/validation";
+import { validateRequired, validateYear, validateMaxLength, hasErrors } from "@/lib/validation";
 
 export default function NewCarPage() {
   const t = useTranslations();
@@ -26,7 +26,15 @@ export default function NewCarPage() {
     const errs: Record<string, string> = {};
 
     const name = (fd.get("name") as string).trim();
+    const make = (fd.get("make") as string).trim();
+    const model = (fd.get("model") as string).trim();
+    const licensePlate = (fd.get("license_plate") as string).trim();
+
     validateRequired(name, "name", errs, t);
+    validateMaxLength(name, "name", 50, errs, t);
+    validateMaxLength(make, "make", 30, errs, t);
+    validateMaxLength(model, "model", 30, errs, t);
+    validateMaxLength(licensePlate, "license_plate", 15, errs, t);
     const year = validateYear(fd.get("year") as string, errs, t);
 
     if (hasErrors(errs)) { setErrors(errs); return; }
@@ -46,10 +54,10 @@ export default function NewCarPage() {
     const { error } = await supabase.from("cars").insert({
       user_id: user.id,
       name,
-      make: (fd.get("make") as string) || null,
-      model: (fd.get("model") as string) || null,
+      make: make || null,
+      model: model || null,
       year,
-      license_plate: (fd.get("license_plate") as string) || null,
+      license_plate: licensePlate || null,
     });
 
     if (error) {
@@ -80,17 +88,17 @@ export default function NewCarPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">{t("cars.name")} *</Label>
-              <Input id="name" name="name" />
+              <Input id="name" name="name" maxLength={50} />
               <FieldError error={errors.name} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="make">{t("cars.make")}</Label>
-                <Input id="make" name="make" />
+                <Input id="make" name="make" maxLength={30} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="model">{t("cars.model")}</Label>
-                <Input id="model" name="model" />
+                <Input id="model" name="model" maxLength={30} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -101,7 +109,7 @@ export default function NewCarPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="license_plate">{t("cars.licensePlate")}</Label>
-                <Input id="license_plate" name="license_plate" />
+                <Input id="license_plate" name="license_plate" maxLength={15} />
               </div>
             </div>
           </CardContent>

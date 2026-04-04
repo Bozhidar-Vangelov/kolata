@@ -1,10 +1,14 @@
 const MAX_PRICE = 99999999.99;
 
-type T = (key: string) => string;
+type T = (key: string, values?: Record<string, string | number>) => string;
 type Errors = Record<string, string>;
 
 export function validateRequired(value: string, field: string, errs: Errors, t: T) {
   if (!value.trim()) errs[field] = t("common.required");
+}
+
+export function validateMaxLength(value: string, field: string, max: number, errs: Errors, t: T) {
+  if (value.length > max) errs[field] = t("common.tooLong", { max });
 }
 
 export function validateDate(value: string, field: string, errs: Errors, t: T) {

@@ -20,7 +20,7 @@ import { MaintenancePageHeader } from "@/components/maintenance/page-header";
 import { NotificationToggles } from "@/components/maintenance/notification-toggles";
 import { FormActions } from "@/components/maintenance/form-actions";
 import { RecordList, formatDate, formatPrice } from "@/components/maintenance/record-list";
-import { validateRequired, validateDateRange, validatePrice, hasErrors } from "@/lib/validation";
+import { validateRequired, validateDateRange, validatePrice, validateMaxLength, hasErrors } from "@/lib/validation";
 import type { Database } from "@/types/database";
 
 type Kasko = Database["public"]["Tables"]["kasko"]["Row"];
@@ -47,6 +47,7 @@ export default function KaskoPage() {
     const endDate = fd.get("end_date") as string;
 
     validateRequired(company, "company", errs, t);
+    validateMaxLength(company, "company", 50, errs, t);
     validateDateRange(startDate, endDate, errs, t);
     const price = validatePrice(fd.get("price"), errs, t);
 
@@ -76,7 +77,7 @@ export default function KaskoPage() {
             <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
               <div className="space-y-2">
                 <Label>{t("kasko.company")}</Label>
-                <Input name="company" defaultValue={m.editing?.company ?? ""} />
+                <Input name="company" maxLength={50} defaultValue={m.editing?.company ?? ""} />
                 <FieldError error={m.errors.company} />
               </div>
               <div className="grid grid-cols-2 gap-4">

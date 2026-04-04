@@ -20,7 +20,8 @@
     "invalidDate": "Invalid date",
     "endBeforeStart": "End date must be after start date",
     "kmNegative": "Kilometers cannot be negative",
-    "nextKmBeforeCurrent": "Next change km must be greater than current km"
+    "nextKmBeforeCurrent": "Next change km must be greater than current km",
+    "tooLong": "Maximum {max} characters"
   },
   "auth": {
     "login": "Sign in",
