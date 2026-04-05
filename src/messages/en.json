@@ -114,5 +114,12 @@
     "hero": "Track your car maintenance",
     "subtitle": "Insurance, kasko, technical inspection, oil, vignette and tires — all in one place.",
     "cta": "Get started for free"
+  },
+  "pwa": {
+    "installTitle": "Install Kolata",
+    "installDescription": "Add the app to your home screen for quick access.",
+    "installButton": "Install",
+    "dismissButton": "Not now",
+    "iosInstructions": "Tap {shareIcon} then \"Add to Home Screen\""
   }
 }

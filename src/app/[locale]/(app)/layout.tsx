@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 
 export default async function AppLayout({
   children,
@@ -19,6 +20,7 @@ export default async function AppLayout({
   return (
     <div className="flex flex-1 flex-col pb-16">
       <main className="flex-1">{children}</main>
+      <PWAInstallPrompt />
       <MobileNav />
     </div>
   );
