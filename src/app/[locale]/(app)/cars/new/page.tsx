@@ -7,6 +7,7 @@ import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { YearPicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import {
   Card,
@@ -48,8 +49,11 @@ export default function NewCarPage() {
 
     validateRequired(name, "name", errs, t);
     validateMaxLength(name, "name", CAR_MAX_LENGTH, errs, t);
+    validateRequired(make, "make", errs, t);
     validateMaxLength(make, "make", MAKE_MAX_LENGTH, errs, t);
+    validateRequired(model, "model", errs, t);
     validateMaxLength(model, "model", MODEL_MAX_LENGTH, errs, t);
+    validateRequired(licensePlate, "license_plate", errs, t);
     validateMaxLength(
       licensePlate,
       "license_plate",
@@ -57,7 +61,7 @@ export default function NewCarPage() {
       errs,
       t
     );
-    const year = validateYear(fd.get("year") as string, errs, t);
+    const year = validateYear(fd.get("year") as string, errs, t, { required: true });
 
     if (hasErrors(errs)) {
       setErrors(errs);
@@ -81,10 +85,10 @@ export default function NewCarPage() {
     const { error } = await supabase.from("cars").insert({
       user_id: user.id,
       name,
-      make: make || null,
-      model: model || null,
+      make,
+      model,
       year,
-      license_plate: licensePlate || null,
+      license_plate: licensePlate,
     });
 
     if (error) {
@@ -124,27 +128,30 @@ export default function NewCarPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="make">{t("cars.make")}</Label>
+                <Label htmlFor="make">{t("cars.make")} *</Label>
                 <Input id="make" name="make" maxLength={MAKE_MAX_LENGTH} />
+                <FieldError error={errors.make} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="model">{t("cars.model")}</Label>
+                <Label htmlFor="model">{t("cars.model")} *</Label>
                 <Input id="model" name="model" maxLength={MODEL_MAX_LENGTH} />
+                <FieldError error={errors.model} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="year">{t("cars.year")}</Label>
-                <Input id="year" name="year" type="number" />
+                <Label htmlFor="year">{t("cars.year")} *</Label>
+                <YearPicker name="year" min={1900} />
                 <FieldError error={errors.year} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="license_plate">{t("cars.licensePlate")}</Label>
+                <Label htmlFor="license_plate">{t("cars.licensePlate")} *</Label>
                 <Input
                   id="license_plate"
                   name="license_plate"
                   maxLength={LICENSE_PLATE_MAX_LENGTH}
                 />
+                <FieldError error={errors.license_plate} />
               </div>
             </div>
           </CardContent>
