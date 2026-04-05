@@ -124,6 +124,7 @@
     "installDescription": "Add the app to your home screen for quick access.",
     "installButton": "Install",
     "dismissButton": "Not now",
-    "iosInstructions": "Tap {shareIcon} then \"Add to Home Screen\""
+    "iosInstructions": "Tap {shareIcon} then \"Add to Home Screen\"",
+    "iosChromeInstructions": "Tap {menuIcon} then \"Add to Home Screen\""
   }
 }

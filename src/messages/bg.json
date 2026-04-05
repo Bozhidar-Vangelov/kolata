@@ -124,6 +124,7 @@
     "installDescription": "Добави приложението към началния екран за бърз достъп.",
     "installButton": "Инсталирай",
     "dismissButton": "Не сега",
-    "iosInstructions": "Натисни {shareIcon} и после \u201eДобави към началния екран\u201c"
+    "iosInstructions": "Натисни {shareIcon} и после \u201eДобави към началния екран\u201c",
+    "iosChromeInstructions": "Натисни {menuIcon} и после \u201eДобави към началния екран\u201c"
   }
 }

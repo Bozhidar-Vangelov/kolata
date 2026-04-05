@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { X, Share } from "lucide-react";
+import { X, Share, EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -12,7 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISS_KEY = "pwa-install-dismissed";
-const DISMISS_DAYS = 30;
+const DISMISS_DAYS = 7;
 
 function isDismissed(): boolean {
   if (typeof window === "undefined") return true;
@@ -30,6 +30,11 @@ function isIOS(): boolean {
   );
 }
 
+function isIOSChrome(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return isIOS() && /CriOS/.test(navigator.userAgent);
+}
+
 function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   return (
@@ -44,6 +49,7 @@ export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showIOSPrompt, setShowIOSPrompt] = useState(false);
+  const [iosChrome, setIOSChrome] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -51,6 +57,7 @@ export function PWAInstallPrompt() {
 
     if (isIOS()) {
       setShowIOSPrompt(true);
+      setIOSChrome(isIOSChrome());
       setVisible(true);
       return;
     }
@@ -98,11 +105,17 @@ export function PWAInstallPrompt() {
             <p className="font-semibold">{t("installTitle")}</p>
             {showIOSPrompt ? (
               <p className="text-sm text-muted-foreground">
-                {t.rich("iosInstructions", {
-                  shareIcon: () => (
-                    <Share className="inline size-4 align-text-bottom" />
-                  ),
-                })}
+                {iosChrome
+                  ? t.rich("iosChromeInstructions", {
+                      menuIcon: () => (
+                        <EllipsisVertical className="inline size-4 align-text-bottom" />
+                      ),
+                    })
+                  : t.rich("iosInstructions", {
+                      shareIcon: () => (
+                        <Share className="inline size-4 align-text-bottom" />
+                      ),
+                    })}
               </p>
             ) : (
               <p className="text-sm text-muted-foreground">
