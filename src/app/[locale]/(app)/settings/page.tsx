@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
 export default function SettingsPage() {
@@ -26,6 +27,25 @@ export default function SettingsPage() {
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
 
+  // Check existing push subscription on mount
+  useEffect(() => {
+    async function checkSubscription() {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+      if (Notification.permission !== "granted") return;
+
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          setPushEnabled(true);
+        }
+      } catch {
+        // Ignore - push not available
+      }
+    }
+    checkSubscription();
+  }, []);
+
   function handleLocaleChange(locale: string | null) {
     if (!locale) return;
     router.replace(pathname, { locale });
@@ -33,6 +53,15 @@ export default function SettingsPage() {
 
   async function handlePushToggle(enabled: boolean) {
     if (!enabled) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+        }
+      } catch {
+        // Ignore unsubscribe errors
+      }
       setPushEnabled(false);
       return;
     }
@@ -51,17 +80,35 @@ export default function SettingsPage() {
         applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
       });
 
-      await fetch("/api/push/subscribe", {
+      const response = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(subscription),
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to save subscription");
+      }
+
       setPushEnabled(true);
-    } catch {
-      // Push subscription failed
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : t("notifications.pushError")
+      );
     }
     setPushLoading(false);
+  }
+
+  async function handleTestPush() {
+    try {
+      const response = await fetch("/api/push/test", { method: "POST" });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Test push failed");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Test push failed");
+    }
   }
 
   async function handleSignOut() {
@@ -109,6 +156,16 @@ export default function SettingsPage() {
               disabled={pushLoading}
             />
           </div>
+          {pushEnabled && process.env.NODE_ENV !== "production" && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full"
+              onClick={handleTestPush}
+            >
+              {t("notifications.testPush")}
+            </Button>
+          )}
         </CardContent>
       </Card>
 
