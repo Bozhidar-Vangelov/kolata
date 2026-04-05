@@ -80,7 +80,12 @@
     "currentKm": "Километри при смяна",
     "nextChangeKm": "Следваща смяна на км",
     "oilType": "Тип масло",
-    "nextChangeDate": "Следваща смяна на"
+    "nextChangeDate": "Следваща смяна на",
+    "filters": "Сменени филтри",
+    "filterOil": "Маслен филтър",
+    "filterAir": "Въздушен филтър",
+    "filterCabin": "Кабинен филтър",
+    "filterFuel": "Горивен филтър"
   },
   "vignette": {
     "title": "Винетка"

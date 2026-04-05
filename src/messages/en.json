@@ -80,7 +80,12 @@
     "currentKm": "Kilometers at change",
     "nextChangeKm": "Next change at km",
     "oilType": "Oil type",
-    "nextChangeDate": "Next change by"
+    "nextChangeDate": "Next change by",
+    "filters": "Changed filters",
+    "filterOil": "Oil filter",
+    "filterAir": "Air filter",
+    "filterCabin": "Cabin filter",
+    "filterFuel": "Fuel filter"
   },
   "vignette": {
     "title": "Vignette"

@@ -6,6 +6,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { FieldError } from "@/components/ui/field-error";
 import { useMaintenance } from "@/hooks/use-maintenance";
 import { MaintenancePageHeader } from "@/components/maintenance/page-header";
@@ -34,19 +35,60 @@ function computeNextChangeDate(changeDate: string): string {
 
 const OIL_TYPE_MAX_LENGTH = 30;
 
+const FILTER_KEYS = [
+  "filter_oil",
+  "filter_air",
+  "filter_cabin",
+  "filter_fuel",
+] as const;
+
+const FILTER_LABEL_KEYS: Record<(typeof FILTER_KEYS)[number], string> = {
+  filter_oil: "oilChange.filterOil",
+  filter_air: "oilChange.filterAir",
+  filter_cabin: "oilChange.filterCabin",
+  filter_fuel: "oilChange.filterFuel",
+};
+
+const DEFAULT_FILTERS = {
+  filter_oil: false,
+  filter_air: false,
+  filter_cabin: false,
+  filter_fuel: false,
+};
+
 export default function OilChangePage() {
   const t = useTranslations();
   const [changeDate, setChangeDate] = useState("");
+  const [filters, setFilters] =
+    useState<Record<(typeof FILTER_KEYS)[number], boolean>>(DEFAULT_FILTERS);
 
   const m = useMaintenance<OilChange>({
     table: "oil_change",
     orderBy: "change_date",
-    onOpenAdd: () => setChangeDate(""),
-    onOpenEdit: (r) => setChangeDate(r.change_date),
-    onCloseForm: () => setChangeDate(""),
+    onOpenAdd: () => {
+      setChangeDate("");
+      setFilters({ ...DEFAULT_FILTERS });
+    },
+    onOpenEdit: (r) => {
+      setChangeDate(r.change_date);
+      setFilters({
+        filter_oil: r.filter_oil,
+        filter_air: r.filter_air,
+        filter_cabin: r.filter_cabin,
+        filter_fuel: r.filter_fuel,
+      });
+    },
+    onCloseForm: () => {
+      setChangeDate("");
+      setFilters({ ...DEFAULT_FILTERS });
+    },
   });
 
   const nextChangeDate = changeDate ? computeNextChangeDate(changeDate) : "";
+
+  function toggleFilter(key: (typeof FILTER_KEYS)[number]) {
+    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -79,8 +121,11 @@ export default function OilChangePage() {
       next_change_km: nextChangeKm,
       oil_type: oilType,
       price,
+      ...filters,
     });
   }
+
+  const activeFilters = (r: OilChange) => FILTER_KEYS.filter((key) => r[key]);
 
   return (
     <div className="p-4 space-y-4">
@@ -147,6 +192,25 @@ export default function OilChangePage() {
                 <FieldError error={m.errors.oil_type} />
               </div>
               <div className="space-y-2">
+                <Label>{t("oilChange.filters")}</Label>
+                <div className="flex flex-wrap gap-2">
+                  {FILTER_KEYS.map((key) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => toggleFilter(key)}
+                    >
+                      <Badge
+                        variant={filters[key] ? "default" : "outline"}
+                        className="cursor-pointer text-sm px-3 py-1 h-auto"
+                      >
+                        {t(FILTER_LABEL_KEYS[key])}
+                      </Badge>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
                 <Label>{t("common.price")}</Label>
                 <Input
                   name="price"
@@ -178,6 +242,15 @@ export default function OilChangePage() {
               {t("oilChange.nextChangeDate")}:{" "}
               {formatDate(computeNextChangeDate(r.change_date))}
             </p>
+            {activeFilters(r).length > 0 && (
+              <div className="flex flex-wrap gap-1 pt-1">
+                {activeFilters(r).map((key) => (
+                  <Badge key={key} variant="secondary" className="text-xs">
+                    {t(FILTER_LABEL_KEYS[key])}
+                  </Badge>
+                ))}
+              </div>
+            )}
             <p>
               {formatPrice(r.price)} {t("common.currency")}
             </p>

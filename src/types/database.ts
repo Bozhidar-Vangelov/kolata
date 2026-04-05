@@ -227,6 +227,10 @@ export type Database = {
           next_change_km: number;
           oil_type: string;
           price: number;
+          filter_oil: boolean;
+          filter_air: boolean;
+          filter_cabin: boolean;
+          filter_fuel: boolean;
           created_at: string;
         };
         Insert: {
@@ -237,6 +241,10 @@ export type Database = {
           next_change_km: number;
           oil_type: string;
           price: number;
+          filter_oil?: boolean;
+          filter_air?: boolean;
+          filter_cabin?: boolean;
+          filter_fuel?: boolean;
           created_at?: string;
         };
         Update: {
@@ -247,6 +255,10 @@ export type Database = {
           next_change_km?: number;
           oil_type?: string;
           price?: number;
+          filter_oil?: boolean;
+          filter_air?: boolean;
+          filter_cabin?: boolean;
+          filter_fuel?: boolean;
           created_at?: string;
         };
         Relationships: [
