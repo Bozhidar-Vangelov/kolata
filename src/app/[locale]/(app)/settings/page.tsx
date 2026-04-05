@@ -124,6 +124,19 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleTestEmail() {
+    try {
+      const response = await fetch("/api/email/test", { method: "POST" });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Test email failed");
+      }
+      toast.success(t("notifications.testEmailSent"));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Test email failed");
+    }
+  }
+
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -177,6 +190,16 @@ export default function SettingsPage() {
               onClick={handleTestPush}
             >
               {t("notifications.testPush")}
+            </Button>
+          )}
+          {process.env.NODE_ENV !== "production" && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 w-full"
+              onClick={handleTestEmail}
+            >
+              {t("notifications.testEmail")}
             </Button>
           )}
         </CardContent>

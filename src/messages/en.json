@@ -103,7 +103,9 @@
     "notify5Days": "5 days before",
     "notify1Day": "1 day before",
     "pushError": "Failed to enable notifications. Please try again.",
-    "testPush": "Send test notification"
+    "testPush": "Send test notification",
+    "testEmail": "Send test email",
+    "testEmailSent": "Test email sent"
   },
   "status": {
     "upcoming": "Upcoming",
