@@ -169,7 +169,8 @@ export default function SettingsPage() {
               disabled={pushLoading}
             />
           </div>
-          {pushEnabled && process.env.NODE_ENV !== "production" && (
+          {/* {pushEnabled && process.env.NODE_ENV !== "production" && ( */}
+          {pushEnabled && (
             <Button
               variant="outline"
               size="sm"
