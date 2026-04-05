@@ -104,6 +104,7 @@
     "notify1Day": "1 ден преди"
   },
   "status": {
+    "upcoming": "Предстоящ",
     "valid": "Валиден",
     "expiringSoon": "Изтича скоро",
     "expired": "Изтекъл",

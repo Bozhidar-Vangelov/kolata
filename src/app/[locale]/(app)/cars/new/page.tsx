@@ -8,11 +8,27 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { FieldError } from "@/components/ui/field-error";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { validateRequired, validateYear, validateMaxLength, hasErrors } from "@/lib/validation";
+import {
+  validateRequired,
+  validateYear,
+  validateMaxLength,
+  hasErrors,
+} from "@/lib/validation";
+
+const CAR_MAX_LENGTH = 30;
+const MAKE_MAX_LENGTH = 30;
+const MODEL_MAX_LENGTH = 30;
+const LICENSE_PLATE_MAX_LENGTH = 15;
 
 export default function NewCarPage() {
   const t = useTranslations();
@@ -31,19 +47,30 @@ export default function NewCarPage() {
     const licensePlate = (fd.get("license_plate") as string).trim();
 
     validateRequired(name, "name", errs, t);
-    validateMaxLength(name, "name", 50, errs, t);
-    validateMaxLength(make, "make", 30, errs, t);
-    validateMaxLength(model, "model", 30, errs, t);
-    validateMaxLength(licensePlate, "license_plate", 15, errs, t);
+    validateMaxLength(name, "name", CAR_MAX_LENGTH, errs, t);
+    validateMaxLength(make, "make", MAKE_MAX_LENGTH, errs, t);
+    validateMaxLength(model, "model", MODEL_MAX_LENGTH, errs, t);
+    validateMaxLength(
+      licensePlate,
+      "license_plate",
+      LICENSE_PLATE_MAX_LENGTH,
+      errs,
+      t
+    );
     const year = validateYear(fd.get("year") as string, errs, t);
 
-    if (hasErrors(errs)) { setErrors(errs); return; }
+    if (hasErrors(errs)) {
+      setErrors(errs);
+      return;
+    }
 
     setErrors({});
     setLoading(true);
 
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       toast.error("Not authenticated");
@@ -84,21 +111,25 @@ export default function NewCarPage() {
         <CardHeader>
           <CardTitle>{t("cars.addCar")}</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">{t("cars.name")} *</Label>
-              <Input id="name" name="name" maxLength={50} />
+              <Input id="name" name="name" maxLength={CAR_MAX_LENGTH} />
               <FieldError error={errors.name} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="make">{t("cars.make")}</Label>
-                <Input id="make" name="make" maxLength={30} />
+                <Input id="make" name="make" maxLength={MAKE_MAX_LENGTH} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="model">{t("cars.model")}</Label>
-                <Input id="model" name="model" maxLength={30} />
+                <Input id="model" name="model" maxLength={MODEL_MAX_LENGTH} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -109,7 +140,11 @@ export default function NewCarPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="license_plate">{t("cars.licensePlate")}</Label>
-                <Input id="license_plate" name="license_plate" maxLength={15} />
+                <Input
+                  id="license_plate"
+                  name="license_plate"
+                  maxLength={LICENSE_PLATE_MAX_LENGTH}
+                />
               </div>
             </div>
           </CardContent>

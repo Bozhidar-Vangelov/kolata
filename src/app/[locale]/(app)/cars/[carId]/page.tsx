@@ -6,7 +6,14 @@ import { Link } from "@/i18n/navigation";
 import { MAINTENANCE_ROUTES, type MaintenanceType } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 import { addYears, format, parseISO } from "date-fns";
-import { ArrowLeft, CircleDot, Droplets, Shield, Ticket, Wrench } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleDot,
+  Droplets,
+  Shield,
+  Ticket,
+  Wrench,
+} from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
@@ -38,43 +45,45 @@ export default async function CarDetailPage({
   if (!car) notFound();
 
   // Fetch latest end dates for each type
-  const [insurance, kasko, inspection, vignette, oilChange] = await Promise.all([
-    supabase
-      .from("insurance")
-      .select("end_date")
-      .eq("car_id", carId)
-      .order("end_date", { ascending: false })
-      .limit(1)
-      .single(),
-    supabase
-      .from("kasko")
-      .select("end_date")
-      .eq("car_id", carId)
-      .order("end_date", { ascending: false })
-      .limit(1)
-      .single(),
-    supabase
-      .from("technical_inspection")
-      .select("end_date")
-      .eq("car_id", carId)
-      .order("end_date", { ascending: false })
-      .limit(1)
-      .single(),
-    supabase
-      .from("vignette")
-      .select("end_date")
-      .eq("car_id", carId)
-      .order("end_date", { ascending: false })
-      .limit(1)
-      .single(),
-    supabase
-      .from("oil_change")
-      .select("change_date")
-      .eq("car_id", carId)
-      .order("change_date", { ascending: false })
-      .limit(1)
-      .single(),
-  ]);
+  const [insurance, kasko, inspection, vignette, oilChange] = await Promise.all(
+    [
+      supabase
+        .from("insurance")
+        .select("start_date, end_date")
+        .eq("car_id", carId)
+        .order("end_date", { ascending: false })
+        .limit(1)
+        .single(),
+      supabase
+        .from("kasko")
+        .select("start_date, end_date")
+        .eq("car_id", carId)
+        .order("end_date", { ascending: false })
+        .limit(1)
+        .single(),
+      supabase
+        .from("technical_inspection")
+        .select("start_date, end_date")
+        .eq("car_id", carId)
+        .order("end_date", { ascending: false })
+        .limit(1)
+        .single(),
+      supabase
+        .from("vignette")
+        .select("start_date, end_date")
+        .eq("car_id", carId)
+        .order("end_date", { ascending: false })
+        .limit(1)
+        .single(),
+      supabase
+        .from("oil_change")
+        .select("change_date")
+        .eq("car_id", carId)
+        .order("change_date", { ascending: false })
+        .limit(1)
+        .single(),
+    ]
+  );
 
   const tiresCount = await supabase
     .from("tires")
@@ -89,6 +98,13 @@ export default async function CarDetailPage({
       ? format(addYears(parseISO(oilChange.data.change_date), 1), "yyyy-MM-dd")
       : null,
     vignette: vignette.data?.end_date ?? null,
+  };
+
+  const startDates: Record<string, string | null> = {
+    insurance: insurance.data?.start_date ?? null,
+    kasko: kasko.data?.start_date ?? null,
+    inspection: inspection.data?.start_date ?? null,
+    vignette: vignette.data?.start_date ?? null,
   };
 
   const hasTires = (tiresCount.count ?? 0) > 0;
@@ -139,7 +155,10 @@ export default async function CarDetailPage({
                       <Badge variant="outline">{t("status.notSet")}</Badge>
                     )
                   ) : (
-                    <StatusBadge endDate={endDates[type]} />
+                    <StatusBadge
+                      endDate={endDates[type]}
+                      startDate={startDates[type]}
+                    />
                   )}
                 </CardContent>
               </Card>

@@ -5,7 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Shield, Car, Wrench, Droplets, Ticket, CircleDot } from "lucide-react";
+import {
+  Plus,
+  Shield,
+  Car,
+  Wrench,
+  Droplets,
+  Ticket,
+  CircleDot,
+} from "lucide-react";
 import { MAINTENANCE_ROUTES, type MaintenanceType } from "@/lib/constants";
 import { addYears, format, parseISO } from "date-fns";
 
@@ -55,28 +63,28 @@ export default async function DashboardPage({
         await Promise.all([
           supabase
             .from("insurance")
-            .select("end_date")
+            .select("start_date, end_date")
             .eq("car_id", car.id)
             .order("end_date", { ascending: false })
             .limit(1)
             .single(),
           supabase
             .from("kasko")
-            .select("end_date")
+            .select("start_date, end_date")
             .eq("car_id", car.id)
             .order("end_date", { ascending: false })
             .limit(1)
             .single(),
           supabase
             .from("technical_inspection")
-            .select("end_date")
+            .select("start_date, end_date")
             .eq("car_id", car.id)
             .order("end_date", { ascending: false })
             .limit(1)
             .single(),
           supabase
             .from("vignette")
-            .select("end_date")
+            .select("start_date, end_date")
             .eq("car_id", car.id)
             .order("end_date", { ascending: false })
             .limit(1)
@@ -104,9 +112,18 @@ export default async function DashboardPage({
           inspection: inspection.data?.end_date ?? null,
           vignette: vignette.data?.end_date ?? null,
           oilChange: oilChange.data?.change_date
-            ? format(addYears(parseISO(oilChange.data.change_date), 1), "yyyy-MM-dd")
+            ? format(
+                addYears(parseISO(oilChange.data.change_date), 1),
+                "yyyy-MM-dd"
+              )
             : null,
           tires: tires.data ? "set" : null,
+        },
+        latestStartDates: {
+          insurance: insurance.data?.start_date ?? null,
+          kasko: kasko.data?.start_date ?? null,
+          inspection: inspection.data?.start_date ?? null,
+          vignette: vignette.data?.start_date ?? null,
         },
       };
     })
@@ -144,6 +161,10 @@ export default async function DashboardPage({
                 (type) => {
                   const Icon = maintenanceIcons[type];
                   const endDate = car.latestEndDates[type];
+                  const startDate =
+                    car.latestStartDates[
+                      type as keyof typeof car.latestStartDates
+                    ] ?? null;
                   return (
                     <Link
                       key={type}
@@ -163,7 +184,7 @@ export default async function DashboardPage({
                           <Badge variant="outline">{t("status.notSet")}</Badge>
                         )
                       ) : (
-                        <StatusBadge endDate={endDate} />
+                        <StatusBadge endDate={endDate} startDate={startDate} />
                       )}
                     </Link>
                   );

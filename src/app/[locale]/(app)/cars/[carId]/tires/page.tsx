@@ -23,18 +23,28 @@ import type { Database } from "@/types/database";
 
 type Tires = Database["public"]["Tables"]["tires"]["Row"];
 
+const BRAND_MAX_LENGTH = 30;
+
 export default function TiresPage() {
   const t = useTranslations();
   const currentYear = new Date().getFullYear();
 
-  const [season, setSeason] = useState<"winter" | "summer" | "all_season">("summer");
+  const [season, setSeason] = useState<"winter" | "summer" | "all_season">(
+    "summer"
+  );
   const [year, setYear] = useState<string>(String(currentYear));
 
   const m = useMaintenance<Tires>({
     table: "tires",
     orderBy: "created_at",
-    onOpenAdd: () => { setSeason("summer"); setYear(String(currentYear)); },
-    onOpenEdit: (r) => { setSeason(r.season); setYear(r.year ? String(r.year) : String(currentYear)); },
+    onOpenAdd: () => {
+      setSeason("summer");
+      setYear(String(currentYear));
+    },
+    onOpenEdit: (r) => {
+      setSeason(r.season);
+      setYear(r.year ? String(r.year) : String(currentYear));
+    },
   });
 
   const seasonLabels: Record<string, string> = {
@@ -48,9 +58,15 @@ export default function TiresPage() {
     const fd = new FormData(e.currentTarget);
     const errs: Record<string, string> = {};
 
-    const year = validateYear(fd.get("year") as string, errs, t, { min: 2000, required: true });
+    const year = validateYear(fd.get("year") as string, errs, t, {
+      min: 2000,
+      required: true,
+    });
 
-    if (hasErrors(errs)) { m.setErrors(errs); return; }
+    if (hasErrors(errs)) {
+      m.setErrors(errs);
+      return;
+    }
 
     await m.submitRecord({
       car_id: m.carId,
@@ -62,34 +78,57 @@ export default function TiresPage() {
 
   return (
     <div className="p-4 space-y-4">
-      <MaintenancePageHeader carId={m.carId} title={t("tires.title")} onAdd={m.openAdd} />
+      <MaintenancePageHeader
+        carId={m.carId}
+        title={t("tires.title")}
+        onAdd={m.openAdd}
+      />
 
       {m.showForm && (
         <Card>
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="flex flex-col gap-4"
+            >
               <div className="space-y-2">
                 <Label>{t("tires.title")}</Label>
-                <Select value={season} onValueChange={(v) => { if (v) setSeason(v as "winter" | "summer" | "all_season"); }}>
+                <Select
+                  value={season}
+                  onValueChange={(v) => {
+                    if (v) setSeason(v as "winter" | "summer" | "all_season");
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue>{seasonLabels[season]}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="winter">{t("tires.winter")}</SelectItem>
                     <SelectItem value="summer">{t("tires.summer")}</SelectItem>
-                    <SelectItem value="all_season">{t("tires.allSeason")}</SelectItem>
+                    <SelectItem value="all_season">
+                      {t("tires.allSeason")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("tires.year")} *</Label>
-                  <YearPicker name="year" defaultValue={year} onValueChange={setYear} />
+                  <YearPicker
+                    name="year"
+                    defaultValue={year}
+                    onValueChange={setYear}
+                  />
                   <FieldError error={m.errors.year} />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("tires.brand")}</Label>
-                  <Input name="brand" maxLength={30} defaultValue={m.editing?.brand ?? ""} />
+                  <Input
+                    name="brand"
+                    maxLength={BRAND_MAX_LENGTH}
+                    defaultValue={m.editing?.brand ?? ""}
+                  />
                 </div>
               </div>
               <FormActions loading={m.loading} onCancel={m.closeForm} />

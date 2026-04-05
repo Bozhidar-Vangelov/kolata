@@ -10,8 +10,19 @@ import { FieldError } from "@/components/ui/field-error";
 import { useMaintenance } from "@/hooks/use-maintenance";
 import { MaintenancePageHeader } from "@/components/maintenance/page-header";
 import { FormActions } from "@/components/maintenance/form-actions";
-import { RecordList, formatDate, formatPrice } from "@/components/maintenance/record-list";
-import { validateDate, validateRequired, validatePrice, validateKm, validateMaxLength, hasErrors } from "@/lib/validation";
+import {
+  RecordList,
+  formatDate,
+  formatPrice,
+} from "@/components/maintenance/record-list";
+import {
+  validateDate,
+  validateRequired,
+  validatePrice,
+  validateKm,
+  validateMaxLength,
+  hasErrors,
+} from "@/lib/validation";
 import { addYears, format, parseISO } from "date-fns";
 import type { Database } from "@/types/database";
 
@@ -20,6 +31,8 @@ type OilChange = Database["public"]["Tables"]["oil_change"]["Row"];
 function computeNextChangeDate(changeDate: string): string {
   return format(addYears(parseISO(changeDate), 1), "yyyy-MM-dd");
 }
+
+const OIL_TYPE_MAX_LENGTH = 30;
 
 export default function OilChangePage() {
   const t = useTranslations();
@@ -44,12 +57,20 @@ export default function OilChangePage() {
     const oilType = (fd.get("oil_type") as string).trim();
 
     validateDate(changeDateVal, "change_date", errs, t);
-    const { currentKm, nextChangeKm } = validateKm(fd.get("current_km"), fd.get("next_change_km"), errs, t);
+    const { currentKm, nextChangeKm } = validateKm(
+      fd.get("current_km"),
+      fd.get("next_change_km"),
+      errs,
+      t
+    );
     validateRequired(oilType, "oil_type", errs, t);
-    validateMaxLength(oilType, "oil_type", 50, errs, t);
+    validateMaxLength(oilType, "oil_type", OIL_TYPE_MAX_LENGTH, errs, t);
     const price = validatePrice(fd.get("price"), errs, t);
 
-    if (hasErrors(errs)) { m.setErrors(errs); return; }
+    if (hasErrors(errs)) {
+      m.setErrors(errs);
+      return;
+    }
 
     await m.submitRecord({
       car_id: m.carId,
@@ -63,12 +84,20 @@ export default function OilChangePage() {
 
   return (
     <div className="p-4 space-y-4">
-      <MaintenancePageHeader carId={m.carId} title={t("oilChange.title")} onAdd={m.openAdd} />
+      <MaintenancePageHeader
+        carId={m.carId}
+        title={t("oilChange.title")}
+        onAdd={m.openAdd}
+      />
 
       {m.showForm && (
         <Card>
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="flex flex-col gap-4"
+            >
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("oilChange.changeDate")}</Label>
@@ -81,29 +110,50 @@ export default function OilChangePage() {
                 </div>
                 <div className="space-y-2">
                   <Label>{t("oilChange.nextChangeDate")}</Label>
-                  <DatePicker value={nextChangeDate} disabled className="bg-muted" />
+                  <DatePicker
+                    value={nextChangeDate}
+                    disabled
+                    className="bg-muted"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("oilChange.currentKm")}</Label>
-                  <Input name="current_km" type="number" defaultValue={m.editing?.current_km ?? ""} />
+                  <Input
+                    name="current_km"
+                    type="number"
+                    defaultValue={m.editing?.current_km ?? ""}
+                  />
                   <FieldError error={m.errors.current_km} />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("oilChange.nextChangeKm")}</Label>
-                  <Input name="next_change_km" type="number" defaultValue={m.editing?.next_change_km ?? ""} />
+                  <Input
+                    name="next_change_km"
+                    type="number"
+                    defaultValue={m.editing?.next_change_km ?? ""}
+                  />
                   <FieldError error={m.errors.next_change_km} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label>{t("oilChange.oilType")}</Label>
-                <Input name="oil_type" maxLength={50} defaultValue={m.editing?.oil_type ?? ""} />
+                <Input
+                  name="oil_type"
+                  maxLength={OIL_TYPE_MAX_LENGTH}
+                  defaultValue={m.editing?.oil_type ?? ""}
+                />
                 <FieldError error={m.errors.oil_type} />
               </div>
               <div className="space-y-2">
                 <Label>{t("common.price")}</Label>
-                <Input name="price" type="number" step="0.01" defaultValue={m.editing?.price ?? ""} />
+                <Input
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  defaultValue={m.editing?.price ?? ""}
+                />
                 <FieldError error={m.errors.price} />
               </div>
               <FormActions loading={m.loading} onCancel={m.closeForm} />
@@ -120,11 +170,17 @@ export default function OilChangePage() {
           <div className="text-sm space-y-1">
             <p className="font-semibold">{r.oil_type}</p>
             <p className="text-muted-foreground">{formatDate(r.change_date)}</p>
-            <p>{r.current_km.toLocaleString()} km → {r.next_change_km.toLocaleString()} km</p>
-            <p className="text-muted-foreground">
-              {t("oilChange.nextChangeDate")}: {formatDate(computeNextChangeDate(r.change_date))}
+            <p>
+              {r.current_km.toLocaleString()} km →{" "}
+              {r.next_change_km.toLocaleString()} km
             </p>
-            <p>{formatPrice(r.price)} {t("common.currency")}</p>
+            <p className="text-muted-foreground">
+              {t("oilChange.nextChangeDate")}:{" "}
+              {formatDate(computeNextChangeDate(r.change_date))}
+            </p>
+            <p>
+              {formatPrice(r.price)} {t("common.currency")}
+            </p>
           </div>
         )}
       />

@@ -19,22 +19,42 @@ import { useMaintenance } from "@/hooks/use-maintenance";
 import { MaintenancePageHeader } from "@/components/maintenance/page-header";
 import { NotificationToggles } from "@/components/maintenance/notification-toggles";
 import { FormActions } from "@/components/maintenance/form-actions";
-import { RecordList, formatDate, formatPrice } from "@/components/maintenance/record-list";
-import { validateRequired, validateDateRange, validatePrice, validateMaxLength, hasErrors } from "@/lib/validation";
+import {
+  RecordList,
+  formatDate,
+  formatPrice,
+} from "@/components/maintenance/record-list";
+import {
+  validateRequired,
+  validateDateRange,
+  validatePrice,
+  validateMaxLength,
+  hasErrors,
+} from "@/lib/validation";
 import type { Database } from "@/types/database";
 
 type Kasko = Database["public"]["Tables"]["kasko"]["Row"];
 
+const COMPANY_MAX_LENGTH = 40;
+
 export default function KaskoPage() {
   const t = useTranslations();
-  const [kaskoType, setKaskoType] = useState<"cash_payout" | "partner_service">("cash_payout");
+  const [kaskoType, setKaskoType] = useState<"cash_payout" | "partner_service">(
+    "cash_payout"
+  );
   const [freeRoadside, setFreeRoadside] = useState(false);
 
   const m = useMaintenance<Kasko>({
     table: "kasko",
     orderBy: "end_date",
-    onOpenAdd: () => { setKaskoType("cash_payout"); setFreeRoadside(false); },
-    onOpenEdit: (r) => { setKaskoType(r.type); setFreeRoadside(r.free_roadside); },
+    onOpenAdd: () => {
+      setKaskoType("cash_payout");
+      setFreeRoadside(false);
+    },
+    onOpenEdit: (r) => {
+      setKaskoType(r.type);
+      setFreeRoadside(r.free_roadside);
+    },
   });
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -47,11 +67,14 @@ export default function KaskoPage() {
     const endDate = fd.get("end_date") as string;
 
     validateRequired(company, "company", errs, t);
-    validateMaxLength(company, "company", 50, errs, t);
+    validateMaxLength(company, "company", COMPANY_MAX_LENGTH, errs, t);
     validateDateRange(startDate, endDate, errs, t);
     const price = validatePrice(fd.get("price"), errs, t);
 
-    if (hasErrors(errs)) { m.setErrors(errs); return; }
+    if (hasErrors(errs)) {
+      m.setErrors(errs);
+      return;
+    }
 
     await m.submitRecord({
       car_id: m.carId,
@@ -69,50 +92,87 @@ export default function KaskoPage() {
 
   return (
     <div className="p-4 space-y-4">
-      <MaintenancePageHeader carId={m.carId} title={t("kasko.title")} onAdd={m.openAdd} />
+      <MaintenancePageHeader
+        carId={m.carId}
+        title={t("kasko.title")}
+        onAdd={m.openAdd}
+      />
 
       {m.showForm && (
         <Card>
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="flex flex-col gap-4"
+            >
               <div className="space-y-2">
                 <Label>{t("kasko.company")}</Label>
-                <Input name="company" maxLength={50} defaultValue={m.editing?.company ?? ""} />
+                <Input
+                  name="company"
+                  maxLength={COMPANY_MAX_LENGTH}
+                  defaultValue={m.editing?.company ?? ""}
+                />
                 <FieldError error={m.errors.company} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>{t("common.startDate")}</Label>
-                  <DatePicker name="start_date" defaultValue={m.editing?.start_date ?? ""} />
+                  <DatePicker
+                    name="start_date"
+                    defaultValue={m.editing?.start_date ?? ""}
+                  />
                   <FieldError error={m.errors.start_date} />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("common.endDate")}</Label>
-                  <DatePicker name="end_date" defaultValue={m.editing?.end_date ?? ""} />
+                  <DatePicker
+                    name="end_date"
+                    defaultValue={m.editing?.end_date ?? ""}
+                  />
                   <FieldError error={m.errors.end_date} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label>{t("kasko.type")}</Label>
-                <Select value={kaskoType} onValueChange={(v) => { if (v) setKaskoType(v as "cash_payout" | "partner_service"); }}>
+                <Select
+                  value={kaskoType}
+                  onValueChange={(v) => {
+                    if (v) setKaskoType(v as "cash_payout" | "partner_service");
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue>
-                      {kaskoType === "cash_payout" ? t("kasko.cashPayout") : t("kasko.partnerService")}
+                      {kaskoType === "cash_payout"
+                        ? t("kasko.cashPayout")
+                        : t("kasko.partnerService")}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cash_payout">{t("kasko.cashPayout")}</SelectItem>
-                    <SelectItem value="partner_service">{t("kasko.partnerService")}</SelectItem>
+                    <SelectItem value="cash_payout">
+                      {t("kasko.cashPayout")}
+                    </SelectItem>
+                    <SelectItem value="partner_service">
+                      {t("kasko.partnerService")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex items-center gap-2">
-                <Switch checked={freeRoadside} onCheckedChange={setFreeRoadside} />
+                <Switch
+                  checked={freeRoadside}
+                  onCheckedChange={setFreeRoadside}
+                />
                 <Label>{t("kasko.freeRoadside")}</Label>
               </div>
               <div className="space-y-2">
                 <Label>{t("common.price")}</Label>
-                <Input name="price" type="number" step="0.01" defaultValue={m.editing?.price ?? ""} />
+                <Input
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  defaultValue={m.editing?.price ?? ""}
+                />
                 <FieldError error={m.errors.price} />
               </div>
               <NotificationToggles defaults={m.editing} />
@@ -125,6 +185,7 @@ export default function KaskoPage() {
       <RecordList
         records={m.records}
         endDateKey="end_date"
+        startDateKey="start_date"
         onDelete={m.handleDelete}
         onEdit={m.openEdit}
         renderDetails={(r) => (
@@ -134,10 +195,14 @@ export default function KaskoPage() {
               {formatDate(r.start_date)} — {formatDate(r.end_date)}
             </p>
             <p>
-              {r.type === "cash_payout" ? t("kasko.cashPayout") : t("kasko.partnerService")}
+              {r.type === "cash_payout"
+                ? t("kasko.cashPayout")
+                : t("kasko.partnerService")}
               {r.free_roadside && ` • ${t("kasko.freeRoadside")}`}
             </p>
-            <p>{formatPrice(r.price)} {t("common.currency")}</p>
+            <p>
+              {formatPrice(r.price)} {t("common.currency")}
+            </p>
           </div>
         )}
       />

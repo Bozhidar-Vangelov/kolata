@@ -17,12 +17,14 @@ export function RecordList<T extends BaseRecord>({
   records,
   renderDetails,
   endDateKey,
+  startDateKey,
   onDelete,
   onEdit,
 }: {
   records: T[];
   renderDetails: (record: T) => React.ReactNode;
   endDateKey?: keyof T;
+  startDateKey?: keyof T;
   onDelete: (id: string) => void;
   onEdit: (record: T) => void;
 }) {
@@ -44,7 +46,14 @@ export function RecordList<T extends BaseRecord>({
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 space-y-1">
                 {endDateKey && (
-                  <StatusBadge endDate={record[endDateKey] as string} />
+                  <StatusBadge
+                    endDate={record[endDateKey] as string}
+                    startDate={
+                      startDateKey
+                        ? (record[startDateKey] as string)
+                        : undefined
+                    }
+                  />
                 )}
                 {renderDetails(record)}
               </div>
